@@ -15,11 +15,17 @@ if st.button("Check"):
     if user_input.strip() != "":
         text_vec = vectorizer.transform([user_input])
         prediction = model.predict(text_vec)[0]
-        prob = model.predict_proba(text_vec)[0].max()
+        probs = model.predict_proba(text_vec)[0]
 
-        if prediction == 0:
-            st.error(f"🛑 Fake News (Confidence: {prob:.2f})")
+        fake_index = list(model.classes_).index(0)  # change if Fake=1
+        real_index = list(model.classes_).index(1)
+
+        fake_prob = probs[fake_index]
+        real_prob = probs[real_index]
+
+        if fake_prob > real_prob:
+            st.error(f"🛑 Fake News (Confidence: {fake_prob:.2f})")
         else:
-            st.success(f"✅ Real News (Confidence: {prob:.2f})")
+            st.success(f"✅ Real News (Confidence: {real_prob:.2f})")
     else:
         st.warning("Please enter some text.")
